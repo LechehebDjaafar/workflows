@@ -2,10 +2,9 @@ name: Auto Commit
 
 on:
   schedule:
-    - cron: "0 5,6,7,8,9,10,11,12,13,14 * * *"
+    - cron: "0 5,6,7,8,9,10,11,12,13,14 * * *"  # تشغيل العمل يوميًا كل ساعة بين 5 و 14
 
-
-  workflow_dispatch:  # هذا يسمح بتشغيله يدويًا إذا لزم الأمر
+  workflow_dispatch:  # تشغيل يدوي إذا لزم الأمر
 
 jobs:
   commit:
@@ -13,7 +12,9 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3  # تحميل مستودعك إلى بيئة التشغيل
+        uses: actions/checkout@v3  # تحميل المستودع إلى بيئة التشغيل
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # استخدام رمز GitHub للتصاريح
 
       - name: Set up Git
         run: |
@@ -25,7 +26,9 @@ jobs:
           echo "Updated on $(date)" >> test_file.txt  # إضافة تحديث إلى الملف
 
       - name: Commit and Push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # توفير الرمز للتصاريح
         run: |
           git add .
           git commit -m "Automated commit - $(date)" || exit 0  # تنفيذ commit
-          git push  # رفع التغييرات إلى المستودع
+          git push origin HEAD:main  # دفع التغييرات باستخدام GITHUB_TOKEN
